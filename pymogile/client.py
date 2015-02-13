@@ -140,7 +140,7 @@ class Client(object):
     return LargeHTTPFile(path=path, backup_dests=backup_dests, readonly=1)
 
 
-  def store_file(self, key, fp, cls=None, chunk_size=8192):
+  def store_file(self, key, fp, cls=None, largefile = False, chunk_size=8192):
     """
     Wrapper around new_file, print, and close.
 
@@ -161,11 +161,11 @@ class Client(object):
     self.run_hook('store_file_start', params)
 
     try:
-      new_file = self.new_file(key, cls)
+      new_file = self.new_file(key, cls, largefile = largefile)
     except MogileFSError:
       fp.close()
       return False
-    
+
     try:
       _bytes = 0
       while True:
@@ -214,10 +214,10 @@ class Client(object):
               'noverify': noverify and 1 or 0,
               'zone': zone,
               'pathcount': pathcount}
-    
+
     res = self.backend.do_request('get_paths', params)
     paths = [res["path%d" % x] for x in xrange(1, int(res["paths"]) + 1)]
-    
+
     self.run_hook('get_paths_end', key)
     return paths
 
