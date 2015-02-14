@@ -149,6 +149,7 @@ class Client(object):
     undef on failure.
     """
     if self.readonly:
+      print 'readonly = ', self.readonly
       return False
 
     params = {}
@@ -162,8 +163,9 @@ class Client(object):
 
     try:
       new_file = self.new_file(key, cls, largefile = largefile)
-    except MogileFSError:
+    except MogileFSError as mfe:
       fp.close()
+      raise mfe
       return False
 
     try:
